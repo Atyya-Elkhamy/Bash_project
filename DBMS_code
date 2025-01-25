@@ -319,11 +319,25 @@ do
                             "Select Range")
                                 read -p "Enter the starting row number: " start
                                 read -p "Enter the ending row number: " end
-                                sed -n "${start},${end}p" "$path/$dbname/$tablename"
+                                if [[ -z "$start" ]] || [[ -z "$end" ]]; then
+                                    echo "Range cannot be empty"
+                                elif [[ "$start" =~ ^[0-9]+$ ]] && [[ "$end" =~ ^[0-9]+$ ]]; then
+                                    sed -n "${start},${end}p" "$path/$dbname/$tablename"
+                                else
+                                    echo "Invalid range"
+                                fi
                                 ;;
                             "Select One Row")
                                 read -p "Enter the row number: " rownum
+                                if [[ -z "$rownum" ]]
+                                then 
+                                echo "rownum cannot be empty";
+                                elif [[ "$rownum" =~ ^[0-9]+$ ]]
+                                then
                                 sed -n "${rownum}p" "$path/$dbname/$tablename"
+                                else
+                                echo "invalid number" ;
+                                fi
                                 ;;
                             "Exit")
                                 break
@@ -361,13 +375,27 @@ do
                         "Delete Range")
                         read -p "enter the starting row number : " start
                         read -p "enter the ending row number : " end
-                        sed -i "${start},${end}d" $path/$dbname/$tablename;
-                        echo "the rows are deleted successfully"
+                        if [[ -z "$start" || -z "$end" ]]; then
+                            echo "Range cannot be empty."
+                        elif [[ "$start" =~ ^[0-9]+$ && "$end" =~ ^[0-9]+$ ]]; then
+                            sed -i "${start},${end}d" $path/$dbname/$tablename;
+                            echo "The rows are deleted successfully."
+                        else
+                            echo "Invalid range."
+                        fi
                         ;;
                         "Delete One Row")
                         read -p "enter the row number : " rownum
+                        if [[ -z "$rownum" ]]
+                        then
+                        echo "cannot be empty "
+                        elif [[ "$rownum" =~ ^[0-9]+$ ]]
+                        then
                         sed -i "${rownum}d" $path/$dbname/$tablename;
                         echo "the row is deleted successfully"
+                        else
+                        echo "invalid number";
+                        fi
                         ;;
                         "Exit")
                         break;
