@@ -298,10 +298,9 @@ do
                                 continue
                             elif [[ "$value" =~ ^[a-zA-Z]+$ ]]; then
                                 break
-                            elsesed -i "${start},${end}d" $path/$dbname/$tablename;
-                        echo "the rows are deleted successfully"
+                            else
                                 echo "Invalid input. Please enter a string."
-                                continue
+                                continue;
                             fi
                         done
                     fi
@@ -329,20 +328,22 @@ do
                             "Select Range")
                                 read -p "Enter the starting row number: " start
                                 read -p "Enter the ending row number: " end
-                                if [[ -z "$start" ]] || [[ -z "$end" ]]; then
-                                    echo "Range cannot be empty"
-                                elif [[ "$start" =~ ^[0-9]+$ ]] && [[ "$end" =~ ^[0-9]+$ ]]; then
-                                    sed -n "${start},${end}p" "$path/$dbname/$tablename"
+                                if [[ ! "$start" =~ ^[0-9]+$ || ! "$end" =~ ^[0-9]+$ ]]; then
+                                echo "Start and end must be numbers."
+                                continue;
+                                elif [[ "$start" -ge 1 && "$end" -le $(wc -l < "$path/$dbname/$tablename") && "$end" != 0 ]]; then
+                                    sed -n "${start},${end}p" "$path/$dbname/$tablename";
                                 else
                                     echo "Invalid range"
+                                    continue;
                                 fi
                                 ;;
                             "Select One Row")
                                 read -p "Enter the row number: " rownum
-                                if [[ -z "$rownum" ]]
-                                then 
-                                echo "rownum cannot be empty";
-                                elif [[ "$rownum" =~ ^[0-9]+$ ]]
+                                if [[ ! "$rownum" =~ ^[0-9]+$ ]]; then
+                                    echo "Row number must be a number."
+                                    continue
+                                elif [[ "$rownum" -ge 1 && "$rownum" -le $(wc -l < "$path/$dbname/$tablename") ]]
                                 then
                                 sed -n "${rownum}p" "$path/$dbname/$tablename"
                                 else
@@ -388,21 +389,29 @@ do
                         "Delete Range")
                         read -p "enter the starting row number : " start
                         read -p "enter the ending row number : " end
+                        if [[ ! "$start" =~ ^[0-9]+$ || ! "$end" =~ ^[0-9]+$ ]]; then
+                            echo "Start and end must be numbers."
+                            continue;
+                        fi
                         if [[ -z "$start" || -z "$end" ]]; then
                             echo "Range cannot be empty."
-                        elif [[ "$start" =~ ^[0-9]+$ && "$end" =~ ^[0-9]+$ ]]; then
+                            continue;
+                        
+                        elif [[ "$start" -ge 1 && "$end" -le $(wc -l < "$path/$dbname/$tablename") && "$end" != 0 ]]; 
+                        then
                             sed -i "${start},${end}d" $path/$dbname/$tablename;
                             echo "The rows are deleted successfully."
                         else
                             echo "Invalid range."
+                            continue;
                         fi
                         ;;
                         "Delete One Row")
                         read -p "enter the row number : " rownum
-                        if [[ -z "$rownum" ]]
-                        then
-                        echo "cannot be empty "
-                        elif [[ "$rownum" =~ ^[0-9]+$ ]]
+                        if [[ ! "$rownum" =~ ^[0-9]+$ ]]; then
+                            echo "Row number must be a number."
+                            continue
+                        elif [[ "$rownum" -ge 1 && "$rownum" -le $(wc -l < "$path/$dbname/$tablename") ]]
                         then
                         sed -i "${rownum}d" $path/$dbname/$tablename;
                         echo "the row is deleted successfully"
@@ -436,6 +445,11 @@ do
                         "Update One Row")
                             read -p "Enter the row number to update: " rownum
                             if [[ ! "$rownum" =~ ^[0-9]+$ ]]; then
+                                echo "Row number must be a number."
+                                continue
+                            fi
+                            if [[ ! "$rownum" -ge 1 && "$rownum" -le $(wc -l < "$path/$dbname/$tablename") ]]; 
+                            then
                                 echo "Invalid row number."
                                 continue
                             fi
@@ -446,10 +460,6 @@ do
                             fi
                             IFS=':' read -r -a fields <<< "$row"
                             for ((i = 0; i < ${#fields[@]}; i++)); do
-                                # read -p "Enter new value for ${fields[i]} (leave empty to keep current value): " new_value
-                                # if [[ -n "$new_value" ]]; then
-                                #     validate2;
-                                # fi
                                 validate2;
                             done
                             new_row=$(IFS=:; echo "${fields[*]}")
@@ -459,8 +469,12 @@ do
                         "Update Range")
                             read -p "Enter the starting row number: " start
                             read -p "Enter the ending row number: " end
-                            if [[ ! "$start" =~ ^[0-9]+$ ]] || [[ ! "$end" =~ ^[0-9]+$ ]]; then
-                                echo "Invalid row numbers."
+                            if [[ ! "$start" =~ ^[0-9]+$ || ! "$end" =~ ^[0-9]+$ ]]; then
+                            echo "Start and end must be numbers."
+                            continue;
+                            fi
+                            if [[ "$start" -lt 1 || "$end" -gt $(wc -l < "$path/$dbname/$tablename") || "$start" -gt "$end" ]]; then
+                                echo "Invalid range."
                                 continue
                             fi
                             for ((rownum = start; rownum <= end; rownum++)); do
