@@ -176,6 +176,7 @@ do
                         for ((i=1;i<=$num_fields;i++))
                         do
                             row="";
+                            while true ; do 
                             read -p "enter the name of field $i : " field_name
                             if [[ ! "$field_name" =~ ^[a-zA-Z0-9_]+$ ]]
                                 then
@@ -184,10 +185,13 @@ do
                                     then
                                     rm $path/$dbname/.$tablename;
                                     fi
-                                    continue 2;
+                                    continue ;
                             else
                                 row+="$field_name:"
+                                break;
                             fi
+                            done
+                            while true ; do 
                             read -p "enter the data_type of field $i (int/string) :" data_type
                             if [[ ! "$data_type" =~ ^(int|string)$ ]]
                                 then
@@ -196,10 +200,12 @@ do
                                     then
                                     rm $path/$dbname/.$tablename;
                                     fi
-                                    continue 2;
+                                    continue ;
                             else
                                 row+="$data_type"
+                                break;
                             fi
+                            done
                             if [[ "$flag" -eq 0 ]]
                                 then 
                                 read -p "are you want add primary key (y/n) : " primary_key
