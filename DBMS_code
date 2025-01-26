@@ -142,7 +142,7 @@ do
         cd $path/$dbname;
         echo "you are connected to the database"
 #----------------------------------------------------------------------------------------------------------
-# Create Table
+# Create Table 
 # - List Tables
 # - Drop Table
 # - Insert into Table
@@ -172,6 +172,7 @@ do
                             echo "Invalid number of fields. Only numbers are allowed."
                             continue 
                         fi
+                        trap 'echo "Operation interrupted. Cleaning up..."; [[ -e $path/$dbname/.$tablename ]] && rm $path/$dbname/.$tablename; exit 1' SIGINT;
                         flag=0;
                         for ((i=1;i<=$num_fields;i++))
                         do
@@ -337,7 +338,7 @@ do
                                 if [[ ! "$start" =~ ^[0-9]+$ || ! "$end" =~ ^[0-9]+$ ]]; then
                                 echo "Start and end must be numbers."
                                 continue;
-                                elif [[ "$start" -ge 1 && "$end" -le $(wc -l < "$path/$dbname/$tablename") && "$end" != 0 ]]; then
+                                elif [[ "$start" -ge 1 && "$end" -le $(wc -l < "$path/$dbname/$tablename") && "$end" -gt "$start" ]]; then
                                     sed -n "${start},${end}p" "$path/$dbname/$tablename";
                                 else
                                     echo "Invalid range"
@@ -349,7 +350,7 @@ do
                                 if [[ ! "$rownum" =~ ^[0-9]+$ ]]; then
                                     echo "Row number must be a number."
                                     continue
-                                elif [[ "$rownum" -ge 1 && "$rownum" -le $(wc -l < "$path/$dbname/$tablename") ]]
+                                elif [[ "$rownum" -ge 1 && "$rownum" -le $(wc -l < "$path/$dbname/$tablename")  ]]
                                 then
                                 sed -n "${rownum}p" "$path/$dbname/$tablename"
                                 else
@@ -403,7 +404,7 @@ do
                             echo "Range cannot be empty."
                             continue;
                         
-                        elif [[ "$start" -ge 1 && "$end" -le $(wc -l < "$path/$dbname/$tablename") && "$end" != 0 ]]; 
+                        elif [[ "$start" -ge 1 && "$end" -le $(wc -l < "$path/$dbname/$tablename") && "$end" -gt "$start" ]]; 
                         then
                             sed -i "${start},${end}d" $path/$dbname/$tablename;
                             echo "The rows are deleted successfully."
