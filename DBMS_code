@@ -201,7 +201,7 @@ do
                             else
                                 row+="$data_type"
                             fi
-                            if [[ "$flag" -eq 0 ]]
+                            if [[ "$flag" -eq 0 ]] 
                                 then 
                                 read -p "are you want add primary key (y/n) : " primary_key
                                     if [[ $primary_key =~ ^([Yy][Ee][Ss]|[Yy]) ]]
