@@ -194,7 +194,11 @@ do
                             if [[ ! "$data_type" =~ ^(int|string)$ ]]
                                 then
                                     echo "Invalid data type. Only int and string are allowed."
-                                    continue
+                                    if [[ -e $path/$dbname/.$tablename ]]
+                                    then
+                                    rm $path/$dbname/.$tablename;
+                                    fi
+                                    continue ;
                             else
                                 row+="$data_type"
                                 break
@@ -549,4 +553,3 @@ do
         ;;
     esac
 done
-
